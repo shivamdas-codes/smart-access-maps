@@ -9,10 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div id="root">
   <div class="app-shell">
     <header class="topbar">
       <a class="brand" href="#home" aria-label="Wayfinder home"><span class="brand-mark">W</span><span>wayfinder</span><span class="beta">PRODUCT CONCEPT</span></a>
@@ -22,7 +21,7 @@
 
     <main id="exploreView" class="view active-view">
       <section class="hero-row">
-        <div><p class="eyebrow"><span class="live-dot"></span> JOURNEYS THAT INCLUDE EVERYONE</p><h1>Get there with <span>more confidence.</span></h1><p class="hero-copy">Look up places and compare road routes. Transit and accessibility details are not verified by this demo.</p></div>
+        <div><p class="eyebrow"><span class="live-dot"></span> JOURNEYS THAT INCLUDE EVERYONE</p><h1>Get there with <span>more confidence.</span></h1><p class="hero-copy">Compare road routes, see local reports and save trip details for offline reference. Traffic, hazards and accessibility are not independently verified.</p></div>
         <div class="hero-note"><span class="note-icon">✳</span><div><strong>Designed around real-world friction</strong><p>Step-free preferences, clearer trade-offs and offline-ready trip details.</p></div></div>
       </section>
 
@@ -39,12 +38,16 @@
           <div class="section-divider"></div>
           <div class="panel-heading compact"><div><p class="eyebrow">YOUR PREFERENCES</p><h3>What matters to you?</h3></div><button id="resetPrefs" class="text-button">Reset</button></div>
           <div class="preference-list">
-            <label class="preference"><span class="pref-icon">♿</span><span><strong>Step-free access</strong><small>Avoid stairs where possible</small></span><input type="checkbox" id="stepFree" checked><i></i></label>
-            <label class="preference"><span class="pref-icon">↗</span><span><strong>Fewer transfers</strong><small>Prefer simpler connections</small></span><input type="checkbox" id="fewTransfers"><i></i></label>
-            <label class="preference"><span class="pref-icon">☂</span><span><strong>Covered walking</strong><small>Reduce exposed walking</small></span><input type="checkbox" id="covered"><i></i></label>
-            <label class="preference"><span class="pref-icon">🔊</span><span><strong>Clear wayfinding</strong><small>Prefer simpler landmarks</small></span><input type="checkbox" id="clearWayfinding"><i></i></label>
+            <label class="preference"><span class="pref-icon">♿</span><span><strong>Step-free access</strong><small>Preference saved · not route-filtered</small></span><input type="checkbox" id="stepFree" checked><i></i></label>
+            <label class="preference"><span class="pref-icon">↗</span><span><strong>Fewer transfers</strong><small>Preference saved · driving only</small></span><input type="checkbox" id="fewTransfers"><i></i></label>
+            <label class="preference"><span class="pref-icon">☂</span><span><strong>Covered walking</strong><small>Preference saved · not route-filtered</small></span><input type="checkbox" id="covered"><i></i></label>
+            <label class="preference"><span class="pref-icon">🔊</span><span><strong>Clear wayfinding</strong><small>Use landmark-based voice guidance</small></span><input type="checkbox" id="clearWayfinding"><i></i></label>
           </div>
-          <div class="access-note"><span>ⓘ</span><p>Place names are sent to Photon and coordinates to OSRM for lookup and routing. Results are driving-only; transit and accessibility preferences are not applied or verified.</p></div>
+          <div class="access-note"><span>ⓘ</span><p>Reports are community-submitted and stored only in this browser. Place queries go to Photon and coordinates to OSRM. No live traffic, verified hazards or accessibility data is available.</p></div>
+          <section class="report-feed" aria-labelledby="reportFeedTitle">
+            <div class="panel-heading compact"><h3 id="reportFeedTitle">Recent local reports</h3></div>
+            <div id="communityReports" aria-live="polite"><p class="report-feed-empty">No local reports yet.</p></div>
+          </section>
         </aside>
 
         <section class="map-panel" aria-label="Interactive route map">
@@ -55,15 +58,16 @@
             <div class="map-legend"><span><i class="legend-blue"></i> Route 1</span><span><i class="legend-amber"></i> Route 2</span><span><i class="legend-purple"></i> Route 3</span></div>
             <div class="map-toast" id="mapToast" role="status">Enter two places to find road routes</div>
           </div>
-          <div class="map-footer"><span>OpenStreetMap · Driving routes only · Not accessibility-verified</span><button id="reportIssue" class="text-button">⚑ Report an accessibility issue</button></div>
+          <div class="map-footer"><span>OpenStreetMap · Driving only · Community reports are unverified</span><button id="reportIssue" class="text-button">⚑ Report a road, access or listing issue</button></div>
         </section>
 
         <aside class="results-panel">
           <div class="results-heading"><div><p class="eyebrow">ROAD ROUTES</p><h2>Choose a route</h2></div><span class="result-count" id="resultCount">No routes yet</span></div>
           <div class="route-cards" id="routeCards"><p class="route-placeholder">Enter a starting point and destination, then select “Find road routes.”</p></div>
           <div class="route-detail" id="routeDetail"><div class="detail-head"><strong>Route details</strong><span class="detail-status">Accessibility not verified</span></div><p class="route-placeholder">Route details will appear here after a search.</p></div>
+          <button id="reviewRouteChange" class="secondary-button full-button">Review another route</button>
           <button id="startJourney" class="primary-button full-button">Preview this journey <span>→</span></button>
-          <p class="microcopy">Driving estimates come from OpenStreetMap-based routing. Transit and accessibility information is not provided.</p>
+          <p class="microcopy">ETA range is illustrative, not live traffic. Review another route to see its explanation and confirm before switching.</p>
         </aside>
       </section>
 
@@ -76,12 +80,14 @@
     <footer class="footer"><span>Wayfinder · Independent product concept · Not affiliated with Google</span><span>Built as an interactive APM portfolio prototype</span></footer>
   </div>
 
-  <dialog id="journeyDialog" class="modal"><form method="dialog"><button class="modal-close" aria-label="Close">×</button></form><div class="modal-symbol">➤</div><p class="eyebrow">JOURNEY PREVIEW</p><h2>Your trip, at a glance</h2><p id="journeySummary" class="modal-copy">Ameerpet Metro Station → HITEC City</p><div class="preview-stats"><div><strong id="previewTime">—</strong><small>Estimated driving time</small></div><div><strong id="previewDistance">—</strong><small>Road distance</small></div><div><strong>Driving</strong><small>Route type</small></div></div><div class="notice-box">ⓘ Driving estimate only. It does not provide turn-by-turn transit directions or verified accessibility data.</div><button id="saveJourney" class="primary-button full-button">☆ Save this journey</button></dialog>
+  <dialog id="journeyDialog" class="modal"><form method="dialog"><button class="modal-close" aria-label="Close">×</button></form><div class="modal-symbol">➤</div><p class="eyebrow">JOURNEY PREVIEW</p><h2>Your trip, at a glance</h2><p id="journeySummary" class="modal-copy">Ameerpet Metro Station → HITEC City</p><div class="preview-stats"><div><strong id="previewTime">—</strong><small>Estimated driving time</small></div><div><strong id="previewDistance">—</strong><small>Road distance</small></div><div><strong>Driving</strong><small>Route type</small></div></div><div class="notice-box">ⓘ Planning range: <strong id="previewRange">—</strong>. Save this journey to keep its text directions on this device for offline reference. Map tiles and rerouting may require a connection.</div><button id="saveJourney" class="primary-button full-button">☆ Save offline journey details</button></dialog>
 
-  <dialog id="issueDialog" class="modal issue-modal"><form method="dialog"><button class="modal-close" aria-label="Close">×</button></form><p class="eyebrow">HELP IMPROVE THE MAP</p><h2>Report an accessibility issue</h2><p class="modal-copy">Share what you noticed. This demo stores your report only in this browser.</p><label class="form-label" for="issueType">What did you notice?</label><select id="issueType"><option>Lift or ramp unavailable</option><option>Footpath blocked or unsafe</option><option>Incorrect step-free information</option><option>Crossing or curb issue</option><option>Other accessibility barrier</option></select><label class="form-label" for="issuePlace">Where did it happen?</label><input id="issuePlace" value="Ameerpet Metro Station" /><label class="form-label" for="issueNotes">Additional details (optional)</label><textarea id="issueNotes" rows="3" placeholder="Describe the barrier and when you noticed it..."></textarea><button id="submitIssue" class="primary-button full-button">Submit report</button></dialog>
+  <dialog id="issueDialog" class="modal issue-modal"><form method="dialog"><button class="modal-close" aria-label="Close">×</button></form><p class="eyebrow">HELP IMPROVE THE MAP</p><h2>Report a local issue</h2><p class="modal-copy">Your report is unverified and saved only in this browser. Use a road, station, crossing or business name to help match it to a route.</p><label class="form-label" for="issueType">What did you notice?</label><select id="issueType"><option>Road under construction</option><option>Road unsafe or dangerous</option><option>Road closed or restricted</option><option>Footpath blocked or unsafe</option><option>Steep slope or missing ramp</option><option>Lift unavailable or broken</option><option>Incorrect step-free information</option><option>Crossing or curb issue</option><option>Business closed or hours incorrect</option><option>Business listing needs verification</option><option>Other accessibility barrier</option></select><label class="form-label" for="issuePlace">Road, station, crossing or business</label><input id="issuePlace" placeholder="For example: Road name or business name" /><label class="form-label" for="issueNotes">Additional details (optional)</label><textarea id="issueNotes" rows="3" placeholder="Describe what you noticed and when..."></textarea><button id="submitIssue" class="primary-button full-button">Submit local report</button></dialog>
+
+  <dialog id="routeChangeDialog" class="modal"><form method="dialog"><button class="modal-close" aria-label="Close">×</button></form><input id="suggestedRoute" type="hidden" /><p class="eyebrow">ROUTE CHANGE REVIEW</p><h2>Review before switching</h2><p id="routeChangeExplanation" class="modal-copy">Compare the alternative route before applying it.</p><button id="acceptRouteChange" class="primary-button full-button">Use this route</button></dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="app.js"></script>
+  </div>
+  <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>

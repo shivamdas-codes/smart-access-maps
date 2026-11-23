@@ -12,7 +12,7 @@
 
 Wayfinder explores a focused improvement to route planning: help travelers compare routes not only by estimated time, but also by transfers, walking distance and accessibility information confidence. The concept gives users preference controls and makes uncertainty visible rather than labeling a route “accessible” when important attributes are unknown.
 
-The prototype includes editable trip inputs, preference toggles, route comparison cards, a route-detail view, journey preview, saved journeys and an accessibility issue-reporting flow. Route values are sample data only.
+The prototype includes editable trip inputs, preference toggles, route comparison cards, a route-detail view, journey preview, saved journeys and an accessibility issue-reporting flow. Place lookup and driving estimates use Photon and the public OSRM demo service; safety, traffic and accessibility attributes remain unverified.
 
 ## 2. Problem framing
 
@@ -83,22 +83,21 @@ This is a hypothesis to test, not a proven result.
 
 ### Included in this prototype
 
-- Origin and destination inputs, swap action and quick destinations.
-- Four preference controls: step-free access, fewer transfers, covered walking and clear wayfinding.
-- Three route alternatives with time, walking distance, transfers and indicative fare.
-- Route selection and route detail steps.
-- Map visual emphasis and demo zoom/layer interactions.
-- Journey preview and save-to-browser behavior.
-- Saved journeys view and delete action.
-- Accessibility issue report form with browser-local storage.
+- React/Vite frontend with origin and destination inputs, swap action and quick destinations.
+- FastAPI REST endpoints for Photon place lookup, OSRM road routing, preferences, saved journeys and community reports.
+- PostgreSQL persistence for preferences, journeys and unverified community reports; PostGIS is enabled with an optional report location field.
+- Route selection and route detail steps, with driving estimates from OSRM.
+- Map visual emphasis and zoom/layer interactions.
+- Journey preview, saved journeys and delete action; previously synced journey details are cached locally for offline reference.
+- Accessibility and road issue reporting; reports persist as unverified submissions.
 - Product concept page explaining problem, hypothesis, MVP and principles.
 
 ### Explicitly out of scope
 
-- Live map tiles, geocoding, GPS or turn-by-turn navigation.
+- Live GPS or turn-by-turn navigation.
 - Live traffic, transit arrivals, service alerts or fare calculations.
 - Real-time station/stop accessibility verification.
-- User accounts, cloud sync or a production backend.
+- Authentication, production-grade identity/authorization, or a production backend.
 - AI-generated route recommendations.
 
 ## 7. Prioritization (illustrative RICE)
@@ -139,13 +138,13 @@ As a traveler, I want to inspect route steps and access notes before departure.
 **Story D — Report a barrier**  
 As a traveler, I want to report an incorrect or missing accessibility attribute.
 - User can choose a barrier type, place and optional notes.
-- Submission confirms the report was stored in this browser only.
+- Submission confirms the report was stored in the prototype database.
 - A production system must add moderation, deduplication, privacy controls and a status loop.
 
 **Story E — Save a journey**  
 As a traveler, I want to save a route for later.
 - Journey preview summarizes route, time, walking distance and indicative fare.
-- Save action stores a route locally in the browser.
+- Save action stores a route in PostgreSQL and caches the synced details locally for offline reference.
 - Saved journey can be removed.
 
 ## 9. Success metrics and guardrails
