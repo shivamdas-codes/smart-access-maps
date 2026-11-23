@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -21,7 +22,7 @@
 
     <main id="exploreView" class="view active-view">
       <section class="hero-row">
-        <div><p class="eyebrow"><span class="live-dot"></span> JOURNEYS THAT INCLUDE EVERYONE</p><h1>Get there with <span>more confidence.</span></h1><p class="hero-copy">Compare routes by time, transfers and accessibility — then choose the journey that works for you.</p></div>
+        <div><p class="eyebrow"><span class="live-dot"></span> JOURNEYS THAT INCLUDE EVERYONE</p><h1>Get there with <span>more confidence.</span></h1><p class="hero-copy">Look up places and compare road routes. Transit and accessibility details are not verified by this demo.</p></div>
         <div class="hero-note"><span class="note-icon">✳</span><div><strong>Designed around real-world friction</strong><p>Step-free preferences, clearer trade-offs and offline-ready trip details.</p></div></div>
       </section>
 
@@ -34,7 +35,7 @@
             <label class="field-label" for="destination">TO</label><div class="input-wrap"><span class="pin destination-pin">●</span><input id="destination" value="HITEC City" autocomplete="off" /><button id="clearDestination" class="clear-input" aria-label="Clear destination">×</button></div>
           </div>
           <div class="quick-destinations"><span>TRY</span><button data-dest="Mindspace Social">Mindspace</button><button data-dest="Inorbit Mall">Inorbit Mall</button><button data-dest="Shilparamam">Shilparamam</button></div>
-          <button id="findRoutes" class="primary-button">Find accessible routes <span>→</span></button>
+          <button id="findRoutes" class="primary-button">Find road routes <span>→</span></button>
           <div class="section-divider"></div>
           <div class="panel-heading compact"><div><p class="eyebrow">YOUR PREFERENCES</p><h3>What matters to you?</h3></div><button id="resetPrefs" class="text-button">Reset</button></div>
           <div class="preference-list">
@@ -43,41 +44,26 @@
             <label class="preference"><span class="pref-icon">☂</span><span><strong>Covered walking</strong><small>Reduce exposed walking</small></span><input type="checkbox" id="covered"><i></i></label>
             <label class="preference"><span class="pref-icon">🔊</span><span><strong>Clear wayfinding</strong><small>Prefer simpler landmarks</small></span><input type="checkbox" id="clearWayfinding"><i></i></label>
           </div>
-          <div class="access-note"><span>ⓘ</span><p>Accessibility details are estimates in this demo. Always confirm facility status with the operator before travelling.</p></div>
+          <div class="access-note"><span>ⓘ</span><p>Place names are sent to Photon and coordinates to OSRM for lookup and routing. Results are driving-only; transit and accessibility preferences are not applied or verified.</p></div>
         </aside>
 
         <section class="map-panel" aria-label="Interactive route map">
-          <div class="map-toolbar"><div class="map-label"><span class="map-dot"></span><span id="mapAreaLabel">HYDERABAD · INDIA</span></div><div class="map-actions"><button id="layersBtn" class="map-tool" title="Toggle map layers">▤ <span>Layers</span></button><button id="locateBtn" class="map-tool" title="Use demo current location">◎ <span>Locate</span></button></div></div>
+          <div class="map-toolbar"><div class="map-label"><span class="map-dot"></span><span id="mapAreaLabel">PLACE SEARCH</span></div><div class="map-actions"><button id="layersBtn" class="map-tool" title="Toggle map layers">▤ <span>Layers</span></button><button id="locateBtn" class="map-tool" title="Show selected route">◎ <span>Route</span></button></div></div>
           <div class="map-canvas" id="mapCanvas">
-            <svg class="map-art" viewBox="0 0 900 650" role="img" aria-label="Illustrated map showing Ameerpet, Madhapur and HITEC City with route alternatives">
-              <defs><pattern id="blocks" width="90" height="74" patternUnits="userSpaceOnUse"><path d="M8 8h54v28H8zM66 46h17v19H66z" fill="#e8eee8" stroke="#dfe7df" stroke-width="2"/><path d="M14 14h42v16H14z" fill="#f3f5ee"/></pattern><pattern id="park" width="48" height="48" patternUnits="userSpaceOnUse"><circle cx="12" cy="12" r="7" fill="#c5dfc8"/><circle cx="32" cy="28" r="9" fill="#c5dfc8"/></pattern></defs>
-              <rect width="900" height="650" fill="#eef3ed"/><rect width="900" height="650" fill="url(#blocks)" opacity=".85"/>
-              <path d="M0 490 C180 430 210 520 360 470 S620 420 900 470 L900 650H0Z" fill="#dcebdc"/><path d="M-30 110 C160 150 220 30 380 105 S660 170 930 80" stroke="#d4e5f3" stroke-width="42" fill="none"/><path d="M-30 110 C160 150 220 30 380 105 S660 170 930 80" stroke="#f8fbff" stroke-width="3" fill="none"/>
-              <path d="M95 -20L240 690M350 -20L430 690M620 -20L570 690M820 -20L740 690M-20 270L930 220M-20 390L930 350M-20 570L930 540" stroke="#fff" stroke-width="15" fill="none"/><path d="M95 -20L240 690M350 -20L430 690M620 -20L570 690M820 -20L740 690M-20 270L930 220M-20 390L930 350M-20 570L930 540" stroke="#d8ded9" stroke-width="2" fill="none"/>
-              <rect x="620" y="390" width="150" height="125" rx="10" fill="url(#park)"/><rect x="90" y="330" width="130" height="95" rx="10" fill="url(#park)"/>
-              <g fill="#91a39a" font-family="DM Sans" font-size="13" font-weight="700" letter-spacing="1"><text x="90" y="85">AMEERPET</text><text x="355" y="280">MADHAPUR</text><text x="660" y="190">HITEC CITY</text><text x="640" y="555">BOTANICAL GARDEN</text><text x="95" y="455">SANJEEVA REDDY NAGAR</text><text x="395" y="605">KONDAPUR</text></g>
-              <g id="routeLines"><path id="routeA" d="M145 155 C230 210 300 235 405 310 S560 385 705 285" stroke="#4285f4" stroke-width="8" stroke-linecap="round" fill="none"/><path id="routeB" d="M145 155 C250 105 360 150 470 225 S620 240 705 285" stroke="#e6a23c" stroke-width="7" stroke-linecap="round" stroke-dasharray="10 10" fill="none"/><path id="routeC" d="M145 155 C170 300 270 390 430 420 S590 365 705 285" stroke="#9b8bd8" stroke-width="7" stroke-linecap="round" stroke-dasharray="4 10" fill="none"/></g>
-              <g class="map-marker" id="startMarker" transform="translate(145 155)"><circle r="15" fill="#fff"/><circle r="9" fill="#34a853"/><circle r="22" fill="none" stroke="#34a853" stroke-opacity=".25" stroke-width="7"/></g>
-              <g class="map-marker" id="endMarker" transform="translate(705 285)"><circle r="18" fill="#fff"/><path d="M0 -12C-7 -12 -12 -7 -12 0c0 9 12 21 12 21S12 9 12 0C12 -7 7 -12 0 -12Z" fill="#ea4335"/><circle cy="0" r="4" fill="#fff"/></g>
-              <g fill="#687c72" font-family="DM Sans" font-size="11"><text x="105" y="190">START</text><text x="722" y="310">DESTINATION</text></g>
-            </svg>
+            <div id="map" class="map-layer" role="application" aria-label="Map showing the selected route"></div>
             <div class="map-zoom"><button id="zoomIn" aria-label="Zoom in">+</button><button id="zoomOut" aria-label="Zoom out">−</button></div>
-            <div class="map-legend"><span><i class="legend-blue"></i> Fastest</span><span><i class="legend-amber"></i> Step-free</span><span><i class="legend-purple"></i> Fewer transfers</span></div>
-            <div class="map-toast" id="mapToast" role="status">Showing illustrative routes around Hyderabad</div>
+            <div class="map-legend"><span><i class="legend-blue"></i> Route 1</span><span><i class="legend-amber"></i> Route 2</span><span><i class="legend-purple"></i> Route 3</span></div>
+            <div class="map-toast" id="mapToast" role="status">Enter two places to find road routes</div>
           </div>
-          <div class="map-footer"><span>Illustrative map · Not live navigation</span><button id="reportIssue" class="text-button">⚑ Report an accessibility issue</button></div>
+          <div class="map-footer"><span>OpenStreetMap · Driving routes only · Not accessibility-verified</span><button id="reportIssue" class="text-button">⚑ Report an accessibility issue</button></div>
         </section>
 
         <aside class="results-panel">
-          <div class="results-heading"><div><p class="eyebrow">ROUTE OPTIONS</p><h2>Choose your journey</h2></div><span class="result-count" id="resultCount">3 routes</span></div>
-          <div class="route-cards" id="routeCards">
-            <button class="route-card selected" data-route="a"><div class="route-card-top"><span class="route-name">Fastest route</span><span class="route-badge blue-badge">FASTEST</span></div><div class="route-time"><strong>28 <small>min</small></strong><span>1 transfer · 450 m walk</span></div><div class="route-visual"><span class="transit-pill metro">M</span><span class="route-dash"></span><span class="transit-pill walk">↗</span><span class="route-dash"></span><span class="transit-pill metro">M</span></div><div class="route-meta"><span>₹ 45 approx.</span><span class="warning-text">Some stairs</span></div></button>
-            <button class="route-card" data-route="b"><div class="route-card-top"><span class="route-name">Step-free journey</span><span class="route-badge green-badge">ACCESSIBLE</span></div><div class="route-time"><strong>36 <small>min</small></strong><span>1 transfer · 250 m walk</span></div><div class="route-visual"><span class="transit-pill metro">M</span><span class="route-dash"></span><span class="transit-pill lift">↟</span><span class="route-dash"></span><span class="transit-pill bus">B</span></div><div class="route-meta"><span>₹ 55 approx.</span><span class="good-text">Step-free info available</span></div></button>
-            <button class="route-card" data-route="c"><div class="route-card-top"><span class="route-name">Fewer transfers</span><span class="route-badge purple-badge">SIMPLE</span></div><div class="route-time"><strong>42 <small>min</small></strong><span>0 transfers · 700 m walk</span></div><div class="route-visual"><span class="transit-pill bus">B</span><span class="route-dash"></span><span class="transit-pill walk">↗</span><span class="route-dash"></span><span class="transit-pill bus">B</span></div><div class="route-meta"><span>₹ 38 approx.</span><span>Longer walk</span></div></button>
-          </div>
-          <div class="route-detail" id="routeDetail"><div class="detail-head"><strong>Journey details</strong><span class="detail-status">● Preference match</span></div><div class="detail-step"><span class="step-icon green-step">●</span><div><strong>Walk to Ameerpet Metro</strong><small>4 min · 250 m · Footpath condition unverified</small></div></div><div class="detail-step"><span class="step-icon blue-step">M</span><div><strong>Metro towards Raidurg</strong><small>18 min · Platform lift status: verify locally</small></div></div><div class="detail-step"><span class="step-icon red-step">↗</span><div><strong>Walk to HITEC City</strong><small>6 min · 200 m · Crossing information unavailable</small></div></div></div>
+          <div class="results-heading"><div><p class="eyebrow">ROAD ROUTES</p><h2>Choose a route</h2></div><span class="result-count" id="resultCount">No routes yet</span></div>
+          <div class="route-cards" id="routeCards"><p class="route-placeholder">Enter a starting point and destination, then select “Find road routes.”</p></div>
+          <div class="route-detail" id="routeDetail"><div class="detail-head"><strong>Route details</strong><span class="detail-status">Accessibility not verified</span></div><p class="route-placeholder">Route details will appear here after a search.</p></div>
           <button id="startJourney" class="primary-button full-button">Preview this journey <span>→</span></button>
-          <p class="microcopy">Times, fares and route details are illustrative demo data — not live transit information.</p>
+          <p class="microcopy">Driving estimates come from OpenStreetMap-based routing. Transit and accessibility information is not provided.</p>
         </aside>
       </section>
 
@@ -90,11 +76,12 @@
     <footer class="footer"><span>Wayfinder · Independent product concept · Not affiliated with Google</span><span>Built as an interactive APM portfolio prototype</span></footer>
   </div>
 
-  <dialog id="journeyDialog" class="modal"><form method="dialog"><button class="modal-close" aria-label="Close">×</button></form><div class="modal-symbol">➤</div><p class="eyebrow">JOURNEY PREVIEW</p><h2>Your trip, at a glance</h2><p id="journeySummary" class="modal-copy">Ameerpet Metro Station → HITEC City</p><div class="preview-stats"><div><strong id="previewTime">36 min</strong><small>Estimated time</small></div><div><strong id="previewWalk">250 m</strong><small>Walking distance</small></div><div><strong id="previewFare">₹55</strong><small>Indicative fare</small></div></div><div class="notice-box">ⓘ This is a concept preview. It does not provide turn-by-turn directions, live transit status or verified accessibility data.</div><button id="saveJourney" class="primary-button full-button">☆ Save this journey</button></dialog>
+  <dialog id="journeyDialog" class="modal"><form method="dialog"><button class="modal-close" aria-label="Close">×</button></form><div class="modal-symbol">➤</div><p class="eyebrow">JOURNEY PREVIEW</p><h2>Your trip, at a glance</h2><p id="journeySummary" class="modal-copy">Ameerpet Metro Station → HITEC City</p><div class="preview-stats"><div><strong id="previewTime">—</strong><small>Estimated driving time</small></div><div><strong id="previewDistance">—</strong><small>Road distance</small></div><div><strong>Driving</strong><small>Route type</small></div></div><div class="notice-box">ⓘ Driving estimate only. It does not provide turn-by-turn transit directions or verified accessibility data.</div><button id="saveJourney" class="primary-button full-button">☆ Save this journey</button></dialog>
 
   <dialog id="issueDialog" class="modal issue-modal"><form method="dialog"><button class="modal-close" aria-label="Close">×</button></form><p class="eyebrow">HELP IMPROVE THE MAP</p><h2>Report an accessibility issue</h2><p class="modal-copy">Share what you noticed. This demo stores your report only in this browser.</p><label class="form-label" for="issueType">What did you notice?</label><select id="issueType"><option>Lift or ramp unavailable</option><option>Footpath blocked or unsafe</option><option>Incorrect step-free information</option><option>Crossing or curb issue</option><option>Other accessibility barrier</option></select><label class="form-label" for="issuePlace">Where did it happen?</label><input id="issuePlace" value="Ameerpet Metro Station" /><label class="form-label" for="issueNotes">Additional details (optional)</label><textarea id="issueNotes" rows="3" placeholder="Describe the barrier and when you noticed it..."></textarea><button id="submitIssue" class="primary-button full-button">Submit report</button></dialog>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="app.js"></script>
 </body>
 </html>

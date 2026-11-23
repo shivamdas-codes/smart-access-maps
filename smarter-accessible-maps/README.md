@@ -2,7 +2,7 @@
 
 An independent, interactive product-management prototype inspired by Google Maps. It explores how a mapping product could help people compare journeys by travel time, transfers, walking distance and accessibility confidence.
 
-> **Important:** This is a portfolio concept, not a Google product and not an official Google Maps integration. The map, route times, fares, stops and accessibility details are illustrative demo data. It does not provide live directions, transit feeds, location tracking or verified accessibility information.
+> **Important:** This is a portfolio concept, not a Google product and not an official Google Maps integration. It displays online driving-route estimates, but does not provide live transit, pedestrian directions, location tracking or verified accessibility information.
 
 ## Run locally
 
@@ -14,10 +14,11 @@ No build step or package installation is required.
 
 ## What works
 
-- Route preference toggles: step-free access, fewer transfers, covered walking and clearer wayfinding.
-- Route option selection with different journey details.
-- Origin/destination editing, swapping, quick destinations and empty-destination validation.
-- Responsive illustrated route map with zoom and layer-style controls.
+- Preference controls for step-free access, fewer transfers, covered walking and clearer wayfinding (the road-routing service does not apply them).
+- Online place lookup and road-route alternatives for entered origins and destinations (requires an internet connection).
+- Route option selection with route distance, estimated driving time and road instructions.
+- Origin/destination editing, automatic lookup on field change, swapping, quick destinations and empty-input validation.
+- Interactive OpenStreetMap view with route lines, start/end markers, zoom and layer-style controls.
 - Journey preview modal and save-to-browser flow.
 - Saved journeys page with remove action (uses browser `localStorage`).
 - Accessibility issue report form (stores reports locally in the browser).
@@ -26,7 +27,7 @@ No build step or package installation is required.
 
 ## Product scope and known limitations
 
-This prototype intentionally demonstrates product decisions and flows rather than production navigation. It uses a hand-drawn SVG map and static sample route data. The search inputs are editable but do not geocode. “Locate” is a demo interaction, not device geolocation. Route selection changes route details and visual emphasis, but does not calculate routes. Accessibility attributes are unverified placeholders and should never be used to make a real travel decision.
+The map uses Leaflet and OpenStreetMap tiles; place lookup uses Photon and road routing uses the public OSRM demo service. Search terms are sent to Photon and resolved coordinates are sent to OSRM. The public services may be unavailable, rate-limited or changed, so this is not a production integration. Results are driving routes only—not transit or pedestrian directions—and accessibility preferences cannot be applied or verified. Do not use these estimates to make travel or accessibility decisions.
 
 ## Suggested production architecture
 
